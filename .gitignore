@@ -1,0 +1,14 @@
+venv/
+__pycache__/
+*.pyc
+engine/weights/*.pth
+engine/_smoke_input.png
+engine/_smoke_output.png
+engine/sweep_output/
+build/
+dist/
+*.spec
+.vscode/
+ChatGPT_one.png
+out.png
+images/

@@ -1,0 +1,8 @@
+# torch/torchvision need PyTorch's own package index for CUDA builds - install first with:
+#   pip install torch torchvision --index-url https://download.pytorch.org/whl/cu126
+# (CPU-only machines can skip that and just `pip install torch torchvision` from PyPI instead)
+torch==2.14.0+cu126
+torchvision==0.29.0+cu126
+
+numpy==2.5.2
+pillow==12.3.0
