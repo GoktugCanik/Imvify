@@ -6,3 +6,5 @@ torchvision==0.29.0+cu126
 
 numpy==2.5.2
 pillow==12.3.0
+
+PySide6==6.11.2
