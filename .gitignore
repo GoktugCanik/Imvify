@@ -13,3 +13,6 @@ ChatGPT_one.png
 out.png
 output.png
 images/
+benchmark/images/*
+benchmark/results/
+benchmark.py

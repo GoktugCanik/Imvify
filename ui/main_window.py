@@ -9,11 +9,12 @@ from PySide6.QtWidgets import (
 from PIL import Image as PILImage
 
 from .worker import EnhanceWorker
+from .comparison_view import BeforeAfterView
 
 IMAGE_FILTER = "Images (*.png *.jpg *.jpeg *.bmp *.webp)"
 SAVE_FILTER = "PNG (*.png);;JPEG (*.jpg *.jpeg)"
 LARGE_IMAGE_PIXELS = 12_000_000  # ~12 MP; warn before running anything bigger
-MODEL_CHOICES = ["swinir-m", "realesr-general-x4v3"]
+MODEL_CHOICES = ["swinir-m", "realesr-general-x4v3", "bsrgan"]
 
 
 class MainWindow(QMainWindow):
@@ -27,8 +28,7 @@ class MainWindow(QMainWindow):
         self.result_image = None
         self.cancel_event = None
 
-        self.preview_label = QLabel("Drop an image here")
-        self.preview_label.setAlignment(Qt.AlignCenter)
+        self.comparison_view = BeforeAfterView()
 
         open_button = QPushButton("Open")
         open_button.clicked.connect(self.open_image_dialog)
@@ -48,6 +48,7 @@ class MainWindow(QMainWindow):
         self.save_button.clicked.connect(self.save_result)
 
         self.device_label = QLabel("Device: -")
+        self.stat_label = QLabel("")
 
         self.progress_bar = QProgressBar()
         self.progress_bar.setVisible(False)
@@ -59,10 +60,11 @@ class MainWindow(QMainWindow):
         controls_layout.addWidget(self.cancel_button)
         controls_layout.addWidget(self.save_button)
         controls_layout.addWidget(self.device_label)
+        controls_layout.addWidget(self.stat_label)
 
         layout = QVBoxLayout()
         layout.addLayout(controls_layout)
-        layout.addWidget(self.preview_label, stretch=1)
+        layout.addWidget(self.comparison_view, stretch=1)
         layout.addWidget(self.progress_bar)
 
         container = QWidget()
@@ -83,12 +85,9 @@ class MainWindow(QMainWindow):
         self.image_path = path
         self.result_image = None
         self.save_button.setEnabled(False)
-        self._show_pixmap(pixmap)
-
-    def _show_pixmap(self, pixmap):
-        self.preview_label.setPixmap(
-            pixmap.scaled(self.preview_label.size(), Qt.KeepAspectRatio, Qt.SmoothTransformation)
-        )
+        self.comparison_view.set_before(pixmap)
+        self.comparison_view.set_after(None)
+        self.comparison_view.setFocus()
 
     def dragEnterEvent(self, event):
         if event.mimeData().hasUrls():
@@ -149,14 +148,16 @@ class MainWindow(QMainWindow):
     def on_device_selected(self, device):
         self.device_label.setText(f"Device: {device.upper()}")
 
-    def on_finished(self, image):
+    def on_finished(self, image, elapsed):
         self.run_button.setEnabled(True)
         self.cancel_button.setEnabled(False)
         self.progress_bar.setVisible(False)
 
         self.result_image = image
         self.save_button.setEnabled(True)
-        self._show_pixmap(QPixmap.fromImage(image.toqimage()))
+        self.comparison_view.set_after(QPixmap.fromImage(image.toqimage()))
+        self.stat_label.setText(f"Last run: {elapsed:.2f}s")
+        self.comparison_view.setFocus()
 
     def on_cancelled(self):
         self.run_button.setEnabled(True)

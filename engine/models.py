@@ -5,6 +5,7 @@ import torch
 
 from .srvgg_arch import SRVGGNetCompact
 from .swinir_arch import SwinIR
+from .rrdbnet_arch import RRDBNet
 
 from pathlib import Path
 
@@ -28,6 +29,14 @@ MODEL_CONFIGS = {
             embed_dim=180, depths=[6, 6, 6, 6, 6, 6], num_heads=[6, 6, 6, 6, 6, 6],
             mlp_ratio=2, resi_connection="1conv",
         ),
+    },
+
+    # Real-world SR (BSRGAN degradation model), from https://github.com/cszn/BSRGAN
+    # (Apache-2.0). Same RRDBNet architecture family as the original ESRGAN.
+    "bsrgan": {
+        "path": WEIGHTS_DIR / "BSRGAN.pth",
+        "scale": 4,
+        "arch": "rrdbnet",
     },
 }
 
@@ -66,6 +75,8 @@ def _build_model(config):
             upscale=config["scale"], in_chans=3, img_size=64, window_size=8,
             img_range=1., upsampler="nearest+conv", **config["swinir_kwargs"],
         )
+    if arch == "rrdbnet":
+        return RRDBNet(in_nc=3, out_nc=3, nf=64, nb=23, gc=32, sf=config["scale"])
     raise ValueError(f"Unknown arch: {arch}")
 
 

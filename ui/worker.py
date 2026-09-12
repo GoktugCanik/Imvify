@@ -1,3 +1,5 @@
+import time
+
 import torch
 from PySide6.QtCore import QThread, Signal
 
@@ -6,7 +8,7 @@ from engine.enhance import enhance_image, EnhanceCancelled
 
 class EnhanceWorker(QThread):
     progress = Signal(int, int)
-    finished = Signal(object)
+    finished = Signal(object, float)
     cancelled = Signal()
     error = Signal(str)
     device_selected = Signal(str)
@@ -22,6 +24,7 @@ class EnhanceWorker(QThread):
         device_name = "cuda" if torch.cuda.is_available() else "cpu"
         self.device_selected.emit(device_name)
 
+        start = time.perf_counter()
         try:
             image = enhance_image(
                 self.input_path, self.output_path, model_name=self.model_name,
@@ -29,7 +32,7 @@ class EnhanceWorker(QThread):
                 progress_callback=lambda done, total: self.progress.emit(done, total),
                 cancel_check=self.cancel_event.is_set,
             )
-            self.finished.emit(image)
+            self.finished.emit(image, time.perf_counter() - start)
         except EnhanceCancelled:
             self.cancelled.emit()
         except Exception as e:
