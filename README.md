@@ -1,8 +1,6 @@
 # Imvify
 
-An AI photo enhancer for Windows that restores old, low-quality photos — removing noise, blur, and compression artifacts, and reconstructing detail — while always preserving the photo's original dimensions.
-
-Under the hood it runs the image through a ×4 super-resolution model and resizes the result back down to the source size; that's an implementation detail of how these models reconstruct detail, not a user-facing resize/upscale feature. This is a Python/AI portfolio project: the goal is a genuinely finished, well-engineered desktop application, not a research demo or a notebook wrapped in a window.
+An AI photo enhancer for Windows that restores old, low-quality photos — removing noise, blur, and compression artifacts, and reconstructing details.
 
 ## Status
 
