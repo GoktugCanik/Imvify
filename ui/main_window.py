@@ -1,12 +1,13 @@
 import threading
 
-from PySide6.QtCore import Qt
+from PySide6.QtCore import Qt, QSettings
 from PySide6.QtGui import QPixmap
 from PySide6.QtWidgets import (
     QMainWindow, QLabel, QPushButton, QVBoxLayout, QHBoxLayout, QWidget,
     QFileDialog, QProgressBar, QMessageBox, QComboBox, QInputDialog,
 )
 from PIL import Image as PILImage
+from pathlib import Path
 
 from .worker import EnhanceWorker
 from .comparison_view import BeforeAfterView
@@ -27,6 +28,7 @@ class MainWindow(QMainWindow):
         self.image_path = None
         self.result_image = None
         self.cancel_event = None
+        self.settings = QSettings("imvify", "IMVIFY")
 
         self.comparison_view = BeforeAfterView()
 
@@ -72,8 +74,10 @@ class MainWindow(QMainWindow):
         self.setCentralWidget(container)
 
     def open_image_dialog(self):
-        path, _ = QFileDialog.getOpenFileName(self, "Open Image", "", IMAGE_FILTER)
+        start_dir = self.settings.value("last_dir", "")
+        path, _ = QFileDialog.getOpenFileName(self, "Open Image", start_dir, IMAGE_FILTER)
         if path:
+            self.settings.setValue("last_dir", str(Path(path).parent))
             self.load_image(path)
 
     def load_image(self, path):
@@ -175,7 +179,8 @@ class MainWindow(QMainWindow):
         if self.result_image is None:
             return
 
-        path, selected_filter = QFileDialog.getSaveFileName(self, "Save Result", "", SAVE_FILTER)
+        start_dir = self.settings.value("last_dir", "")
+        path, selected_filter = QFileDialog.getSaveFileName(self, "Save Result", start_dir, SAVE_FILTER)
         if not path:
             return
 

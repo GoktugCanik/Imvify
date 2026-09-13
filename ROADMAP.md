@@ -38,16 +38,17 @@ Milestones are sequenced so there is always a genuinely working, testable artifa
 - Quick-flicker keyboard toggle
 - **Exit criteria**: the comparison experience is the thing you'd put in a demo GIF
 
-## Milestone 4 — Packaging (not started)
-- `QSettings` for last-used folder
-- PyInstaller build
-- Inno Setup installer, bundled model weights
-- **Exit criteria**: a `.exe` installer that runs on a clean Windows machine with no Python installed
-
-## Milestone 5 (V1.1) — Batch processing (not started)
-- Folder-in → folder-out queue, per-file + overall progress, cancel-mid-batch, output filename collisions handled
+## Milestone 4 (V1.1) — Batch processing (not started)
+- Multi-select images via file dialog (ctrl/shift-click) or drag-and-drop — not folder-only
+- Scrollable horizontal thumbnail filmstrip docked at the bottom of the window (~10 visible at once); each thumbnail always shows the **original** image, never the enhanced result
+- Clicking a thumbnail loads that image into the existing before/after view above, which is otherwise unchanged
+- Thumbnails are individually removable from the batch without clearing the whole set
+- Per-image enhanced results persist in memory keyed to their thumbnail — switching away and back shows the already-computed result instead of re-running
+- Two run modes: a global "Run" processes every image in the batch in sequence (per-thumbnail progress indicator + overall progress bar); a per-image re-run re-processes just the selected thumbnail (e.g. after changing model/preset) without touching the rest
+- Cancel stops after the image currently being processed finishes — earlier results are kept, later images are left untouched
+- "Save All" exports every enhanced result to a chosen output folder in one go, with output filename collisions handled; the existing single-image Save still works on whichever thumbnail is selected
 - UI-only addition — the engine already processes one image at a time by design
-- **Exit criteria**: point it at a folder of old photos and walk away
+- **Exit criteria**: select 50 images, run the batch, scrub through the filmstrip inspecting before/after per image, cancel partway through and confirm completed ones are kept, then Save All
 
 ## V1 portfolio wrap-up (not started)
 - Unit tests on `engine/` (corrupted file, tiny image, odd channel count, tiling boundary)
@@ -60,6 +61,13 @@ Milestones are sequenced so there is always a genuinely working, testable artifa
 - **Colorization** (DeOldify or DDColor) for B&W photos
 - **Inpainting** (LaMa) for scratches/damage — completes the "restore an old photo" pipeline
 - Minimal model-registry abstraction in `engine/` to support multiple optional stages cleanly
+
+## Packaging (not started) — moved here from V1; do once V2 (face restoration, colorization, inpainting) is done, so the packaged app reflects real quality, not just the whole-image V1 pipeline
+- `QSettings` for last-used folder
+- PyInstaller build
+- Windows installer/distribution: tool choice deferred until this milestone starts. Options: NSIS (free for commercial use at any version), Inno Setup ≤6.4.3 (last version free for commercial use — 6.5+ requires a paid license if used commercially), or skip a formal installer and just zip the PyInstaller output as a portable distribution
+- Bundled model weights (covering the full V1+V2 model set by this point)
+- **Exit criteria**: a Windows installer or portable package that runs on a clean machine with no Python installed
 
 ## V3+ — Not committed, revisit only once V1/V2 are real
 - ONNX + DirectML for non-NVIDIA GPU support
