@@ -16,3 +16,5 @@ images/
 benchmark/images/*
 benchmark/results/
 benchmark.py
+ROADMAP.md
+PROJECT_OVERVIEW.md
