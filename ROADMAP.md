@@ -38,7 +38,7 @@ Milestones are sequenced so there is always a genuinely working, testable artifa
 - Quick-flicker keyboard toggle
 - **Exit criteria**: the comparison experience is the thing you'd put in a demo GIF
 
-## Milestone 4 (V1.1) — Batch processing (not started)
+## Milestone 4 (V1.1) — Batch processing ✅ Done
 - Multi-select images via file dialog (ctrl/shift-click) or drag-and-drop — not folder-only
 - Scrollable horizontal thumbnail filmstrip docked at the bottom of the window (~10 visible at once); each thumbnail always shows the **original** image, never the enhanced result
 - Clicking a thumbnail loads that image into the existing before/after view above, which is otherwise unchanged

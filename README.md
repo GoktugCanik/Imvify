@@ -4,14 +4,17 @@ An AI photo enhancer for Windows that restores old, low-quality photos — remov
 
 ## Status
 
-**Core single-image workflow complete.** Both the restoration engine (`engine/`) and the PySide6 desktop UI (`ui/`) are functional: open an image, run it through one of three restoration models, compare before/after, save the result. Packaging as a standalone Windows installer and batch (folder-in/folder-out) processing are not built yet. See `ROADMAP.md` for the full milestone breakdown and `PROJECT_OVERVIEW.md` for the architecture and scope decisions behind them.
+**Single-image and batch workflows complete.** Both the restoration engine (`engine/`) and the PySide6 desktop UI (`ui/`) are functional: open one or many images, run them through one of three restoration models, compare before/after, save the result(s). Packaging as a standalone Windows installer is not built yet. See `ROADMAP.md` for the full milestone breakdown and `PROJECT_OVERVIEW.md` for the architecture and scope decisions behind them.
 
 ## How it works
 
-- Open an image via file dialog or drag & drop; EXIF orientation and alpha/grayscale/CMYK input are handled correctly
-- Pick a model, hit Run — inference happens on a background thread, tiled so large images don't exhaust limited VRAM/RAM, with progress shown and mid-run cancel honored between tiles
+- Open one or many images via file dialog (multi-select) or drag & drop; EXIF orientation and alpha/grayscale/CMYK input are handled correctly
+- Loaded images appear as a thumbnail filmstrip (always showing the original); click a thumbnail to load it into the before/after view above
+- Pick a model, then either **Run** the currently selected image or **Run All** to process every not-yet-run image in the batch in sequence — inference happens on a background thread, tiled so large images don't exhaust limited VRAM/RAM, with per-image and overall progress shown
+- Cancel is honored between tiles for a single run; during a batch run, Cancel lets the in-flight image finish and stops before starting the next one — completed results are kept, later images are left untouched and can be resumed with Run All later
+- Per-image results are cached in memory, so switching between thumbnails shows the already-computed result instead of re-running
 - Compare the result against the original with a draggable before/after slider, zoom/pan to 100%, and a quick-flicker keyboard toggle
-- Save the result with a format and quality choice
+- Save the selected result with a format and quality choice, or **Save All** to export every completed result in the batch to a chosen folder in one go (filename collisions are handled automatically)
 
 ## Models
 
@@ -91,6 +94,6 @@ The `SRVGGNetCompact`, `SwinIR`, and `RRDBNet` model architectures are vendored 
 ## Known limitations
 
 - No standalone Windows installer yet — must be run from a Python environment (`python main.py`)
-- No batch (folder-in/folder-out) processing yet — one image at a time
+- Batch mode is file-select/drag-and-drop only, not folder-in/folder-out — pick individual files (or select many at once) rather than pointing at a folder
 - No unit tests yet
 - GPU acceleration is CUDA-only; no DirectML/non-NVIDIA GPU support yet
