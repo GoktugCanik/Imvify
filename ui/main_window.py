@@ -1,3 +1,4 @@
+import tempfile
 import threading
 
 from PySide6.QtCore import Qt, QSettings
@@ -17,6 +18,10 @@ IMAGE_FILTER = "Images (*.png *.jpg *.jpeg *.bmp *.webp)"
 SAVE_FILTER = "PNG (*.png);;JPEG (*.jpg *.jpeg)"
 LARGE_IMAGE_PIXELS = 12_000_000  # ~12 MP; warn before running anything bigger
 MODEL_CHOICES = ["swinir-m", "realesr-general-x4v3", "bsrgan"]
+# enhance_image() always writes a scratch copy to this path; the actual result the
+# user saves comes from the returned image object, not this file, so it just needs
+# to live somewhere writable regardless of where the app is installed.
+SCRATCH_OUTPUT_PATH = str(Path(tempfile.gettempdir()) / "imvify_scratch.png")
 
 
 class BatchItem:
@@ -284,7 +289,7 @@ class MainWindow(QMainWindow):
         self.progress_bar.setValue(0)
 
         model_name = self.model_combo.currentText()
-        self.worker = EnhanceWorker(item.path, "output.png", model_name, self.cancel_event)
+        self.worker = EnhanceWorker(item.path, SCRATCH_OUTPUT_PATH, model_name, self.cancel_event)
         self.worker.progress.connect(self.on_progress)
         self.worker.finished.connect(self.on_finished)
         self.worker.cancelled.connect(self.on_cancelled)
